@@ -1,0 +1,120 @@
+#Problem 3.8
+''' Develop a program that can calculate the integral with a given integrand f(x)
+    in the region [a, b] by the Simpson rule with nonuniform data points.
+    Check its accuracy with the integral of e^(x)dx from zero to infinity
+    with x_j=j*h*e^(j*alpha), where h and alpha are small constants.
+'''
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+#Simpson rule..
+def simphson_integration(a,b,f,N=1000):
+    ''' This present function is about simphson integration.'''
+    inital_x=a#inital boundary point
+    final_x=b#final boundary point
+    dx=(final_x-inital_x)/N #generating dx point
+    sum=0
+    for i in range(N):
+        #integration process
+
+        if i==0:
+            sum += f(inital_x)
+            inital_x += dx
+        elif (i%2)!=0: # i is even
+            sum +=4 * f(inital_x)
+            inital_x += dx
+        elif (i%2)==0: # i is odd
+            sum += 2 * f(inital_x)
+            inital_x += dx
+        if i==N-1:
+            sum+=f(inital_x)
+
+    return (dx/3)*sum
+
+def simphson_integration_non_uniform_random_data_points(a,b,f,N=1000):
+    inital_x=a
+    final_x=b
+    non_unform = np.random.uniform(low=inital_x, high=final_x, size=(N,))
+    non_unform=sorted(non_unform)
+    #plt.hist(non_unform)
+    #plt.show()
+
+    dx=0
+    sum=0
+    for i in range(len(non_unform)-1):
+        '''Calculate mean dx due to all dx values are diffs from each other'''
+        dx+=non_unform[i+1]-non_unform[i]
+
+        if i==0:
+            sum += f(inital_x)
+            inital_x += non_unform[1]-non_unform[00]
+        elif (i%2)!=0: # i is even
+            sum +=4 * f(inital_x)
+            inital_x += non_unform[i+1]-non_unform[i]
+        elif (i%2)==0: # i is odd
+            sum += 2 * f(inital_x)
+            inital_x += non_unform[i+1]-non_unform[i]
+        if i==N-1:
+            sum+=f(inital_x)
+
+    mean_dx=dx/len(non_unform)
+
+    return (mean_dx/(3))*sum
+
+def simphson_integration_non_uniform_random_data_points_assignment(non_uniform,f):
+    inital_x=non_uniform[0]
+
+    dx=0
+    sum=0
+    for i in range(len(non_uniform)-1):
+        '''Calculate mean dx due to all dx values are diffs from each other'''
+        dx+=non_uniform[i+1]-non_uniform[i]
+
+        if i==0:
+            sum += f(inital_x)
+            inital_x += non_uniform[1]-non_uniform[00]
+        elif (i%2)!=0: # i is even
+            sum +=4 * f(inital_x)
+            inital_x += non_uniform[i+1]-non_uniform[i]
+        elif (i%2)==0: # i is odd
+            sum += 2 * f(inital_x)
+            inital_x += non_uniform[i+1]-non_uniform[i]
+        if i==len(non_uniform)-1:
+            sum+=f(inital_x)
+
+    mean_dx=dx/len(non_uniform)
+
+    return (mean_dx/(3))*sum
+
+def x_j(j,h,alpha):
+    return j*h*np.exp(j*alpha)
+
+def negative_exp(x):
+    return np.exp(-x)
+
+def generate_xj_points(h,alpha,N):
+    x=[]
+    for i in range(1,N):
+        x.append(x_j(i,h,alpha))
+    return x
+
+
+
+
+
+a,b=0.000001,1000
+print("Boundary points a=",a," b=",b)
+
+print("Integration of given function is: ",simphson_integration(a,b,negative_exp,N=1000000))
+
+x_data=np.linspace(a,b,100000)
+y_data=negative_exp(x_data)
+
+
+plt.plot(x_data,y_data)
+plt.xlabel("x")
+plt.ylabel("Y=e^(-x)")
+plt.show()
+
